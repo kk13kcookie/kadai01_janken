@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <title>じゃんけん</title>
+  </head>
+  <body
+    class="flex flex-col justify-center items-center w-full h-full md:text-xl text-normal"
+  >
+    <!-- Audio管理 -->
+    <audio
+      src="./sound/audio_16383_sample_jankenpon.m4a"
+      id="jankenMusic"
+    ></audio>
+    <audio src="./sound/audio_16401_sample_guu.m4a" id="guuMusic"></audio>
+    <audio src="./sound/audio_16411_sample_choki.m4a" id="chokiMusic"></audio>
+    <audio src="./sound/audio_16418_sample_paa.m4a" id="paaMusic"></audio>
+    <audio src="./sound/audio_15891_sample_win.m4a" id="winMusic"></audio>
+    <audio src="./sound/audio_15318_sample_lose.m4a" id="loseMusic"></audio>
+    <audio src="./sound/audio_6847_sample_draw.m4a" id="drawMusic"></audio>
+
+    <!-- header -->
+    <div class="header m-8 space-y-6">
+      <h1 class="font-bold md:text-3xl text-xl text-center">
+        🔥じゃんけんしよう！🔥
+      </h1>
+      <p class="font-normal mdtext-xl text-center">
+        スタートを押して、ジャンケンポンの後に👊✌️🖐️ボタンを押して
+      </p>
+    </div>
+
+    <!-- start button -->
+    <div class="flex flex-col space-y-4">
+      <button
+        id="start"
+        class="py-2 px-8 border-2 border-solid border-red-500 rounded-lg hover:bg-red-400"
+      >
+        スタート
+      </button>
+    </div>
+
+    <!-- player&pc container -->
+    <div
+      class="flex space-x-6 space-y-4 justify-center items-stretch text-center m-6"
+    >
+      <!-- player -->
+      <div class="flex flex-col space-y-2">
+        <p class="text-center">あなた</p>
+        <div class="flex justify-center items-center text-center">
+          <button
+            id="guu"
+            class="py-2 px-8 border-2 border-solid border-red-300 rounded-lg hover:bg-red-400"
+          >
+            👊
+          </button>
+          <button
+            id="choki"
+            class="py-2 px-8 border-2 border-solid border-red-300 rounded-lg hover:bg-red-400"
+          >
+            ✌️
+          </button>
+          <button
+            id="paa"
+            class="py-2 px-8 border-2 border-solid border-red-300 rounded-lg hover:bg-red-400"
+          >
+            🖐️
+          </button>
+        </div>
+      </div>
+
+      <!-- PC -->
+      <div class="flex flex-col space-y-2">
+        <p>PC</p>
+        <button
+          id="pcHand"
+          class="py-2 px-8 border-2 border-solid border-slate-300 rounded-lg"
+        >
+          👊✌️🖐️
+        </button>
+      </div>
+    </div>
+
+    <!-- 結果表示 -->
+    <div class="m-6 space-y-4">
+      <p id="result" class="text-center">結果：</p>
+      <div class="flex space-between items-center justify-center space-x-6">
+        <p id="win">勝ち: 0</p>
+        <p id="lose">負け: 0</p>
+        <p id="draw">あいこ: 0</p>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+      // PCの手をランダム　ファンクション
+      function GetRandomHand() {
+        const hands = ["👊", "✌️", "🖐️"];
+        return hands[Math.floor(Math.random() * 3)];
+      }
+
+      let win = 0;
+      let lose = 0;
+      let draw = 0;
+
+      // 結果表示ファンクション
+      function result(playerHand, pcHand) {
+        if (playerHand === pcHand) {
+          $("#result").text("引き分け");
+          setTimeout(function () {
+            $("#drawMusic").get(0).play();
+          }, 500);
+          draw++;
+          $("#draw").text("あいこ: " + draw);
+        } else if (
+          (playerHand === "👊" && pcHand === "✌️") ||
+          (playerHand === "✌️" && pcHand === "🖐️") ||
+          (playerHand === "🖐️" && pcHand === "👊")
+        ) {
+          $("#result").text("勝ち！！！");
+          setTimeout(function () {
+            $("#winMusic").get(0).play();
+          }, 500);
+          win++;
+          $("#win").text("勝ち: " + win);
+        } else {
+          $("#result").text("負け...");
+          setTimeout(function () {
+            $("#loseMusic").get(0).play();
+          }, 500);
+          lose++;
+          $("#lose").text("負け: " + lose);
+        }
+      }
+
+      // スタートボタンを押したらじゃんけん音とPCの手の表示を戻す
+      $("#start").on("click", function () {
+        // console.log("start button");
+        $("#jankenMusic").get(0).play();
+        $("#guu").fadeIn();
+        $("#choki").fadeIn();
+        $("#paa").fadeIn();
+        $("#pcHand").text("👊✌️🖐️");
+      });
+
+      // あなたの手のボタンを押したら、pcの手を表示、結果表示、カウント更新
+
+      // 👊
+      $("#guu").on("click", function () {
+        // console.log("guu button");
+        $("#guuMusic").get(0).play();
+        $("#choki").fadeOut();
+        $("#paa").fadeOut();
+        const pcHand = GetRandomHand();
+        $("#pcHand").text(pcHand);
+        result("👊", pcHand);
+      });
+
+      // ✌️
+      $("#choki").on("click", function () {
+        // console.log("choki button");
+        $("#chokiMusic").get(0).play();
+        $("#guu").fadeOut();
+        $("#paa").fadeOut();
+        const pcHand = GetRandomHand();
+        $("#pcHand").text(pcHand);
+        result("✌️", pcHand);
+      });
+
+      // 🖐️
+      $("#paa").on("click", function () {
+        // console.log("paa button");
+        $("#paaMusic").get(0).play();
+        $("#guu").fadeOut();
+        $("#choki").fadeOut();
+        const pcHand = GetRandomHand();
+        $("#pcHand").text(pcHand);
+        result("🖐️", pcHand);
+      });
+    </script>
+  </body>
+</html>
